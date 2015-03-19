@@ -1,0 +1,10 @@
+# <nombre> <numero de dados> <tipo de dado> <bono>
+1d100 1 100 0
+1d10 1 10 0
+1d20 1 20 0
+# Se puede substituir <tipo de dado> por un tipo especial, como anima. Eso implica un numero de dados fijo, independientemente de <numero de dados>
+percepcion 1 anima 65
+atletismo 1 anima 25
+ocultismo 1 anima 45
+fudge 1 fudge 0
+sigilo 1 fudge 4
