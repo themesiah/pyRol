@@ -48,10 +48,11 @@ def roll(dice):
 
     return rolled
 
+
 def connection(s, pl):
     s.listen(1)
     conn, addr = s.accept()
-    print 'Connection address: ', addr
+    print 'Connection address: '+ str(addr)
     name = None
     pl.append([conn, None, False])
     thread.start_new_thread( connection, (s, pl,) )

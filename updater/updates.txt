@@ -1,0 +1,7 @@
+$1
+files/fatal.pdf
+$2
+files/Pomposity.mp3
+files/Title.mp3
+$3
+files/charlotte.png
