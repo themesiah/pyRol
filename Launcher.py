@@ -1,8 +1,16 @@
 # -*- coding: cp1252 -*-
 import socket, os
 
-TCP_IP = "localhost"
-TCP_PORT = 6901
+
+f = open("data.ini", 'r')
+for line in f:
+    parts = line.split("=")
+    if parts[0] == "IP":
+        TCP_IP = parts[1].rstrip()
+    if parts[0] == "PORT":
+        TCP_PORT = int(parts[1].rstrip())
+f.close()
+
 BUFFER_SIZE = 4098
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
