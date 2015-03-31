@@ -62,6 +62,7 @@ def connection(s, pl):
         name = msg.player
         if msg.master == "password":
             masterStatus = True
+            print "Logged a Master with name: " + name
         else:
             masterStatus = False
 
@@ -134,13 +135,13 @@ def connection(s, pl):
 
         elif msg.type == 6:
             for p in pl:
-                if p[1] == msg.target:
+                if p[1] == msg.target or p[2] == True:
                     p[0].send(msg.serialize())
             
                 
 
 IP = ""
-PORT = 6901
+PORT = 6900
 BUFFER = 4098
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

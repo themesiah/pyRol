@@ -107,8 +107,7 @@ class MainWindow(Frame):
                 elif recvMsg.type == 5:
                     self.onClose()
                 elif recvMsg.type == 6:
-                    if recvMsg.target == self.player:
-                        self.showMessage(recvMsg.player, recvMsg.getAll()[0])
+                    self.showMessage(recvMsg.player, recvMsg.getAll()[0])
 
     def centerWindow(self):
       
@@ -204,11 +203,13 @@ class MainWindow(Frame):
         msg = Message()
         msg.player = self.player
         if txt[0] == self.COMMANDCHAR:
-            if txt[1] == 'w' or txt[1] == 'W':
+            if (txt[1] == 'w' or txt[1] == 'W') and len(txt) > 2:
                 pieces = txt.split(" ", 2)
                 msg.target = pieces[1]
-                msg.addMessage("(whisp): " + pieces[2])
+                msg.addMessage("("+msg.target+") " + pieces[2])
                 msg.type = 6
+            else:
+                msg = None
             if txt.split(" ")[0][1:] == "roll":
                 if txt.split(" ")[1] in self.macros:
                     roll = self.macros[txt.split(" ")[1]]

@@ -1,3 +1,5 @@
 Peta al poner nombre incorrecto. Arreglar!
 
-El master debe poder leer los whisps!
+Crear actualizador.
+
+Poner el chat to guapo.
