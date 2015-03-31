@@ -40,12 +40,4 @@ f.write(version)
 f.close()
 s.close()
 
-
-print "1- x86 bits"
-print "2- x64 bits"
-toOpen = int(raw_input("Elige tu versión: "))
-
-if toOpen == 1:
-    os.startfile("x86/rolClient.exe")
-else:
-    os.startfile("x64/rolClient.exe")
+os.startfile("rol/rolClient.exe")
