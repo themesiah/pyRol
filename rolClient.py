@@ -1,6 +1,7 @@
 # -*- coding: cp1252 -*-
 from Tkinter import Tk, BOTH, Frame, Label, Text, E, W, S, N, DISABLED, END, INSERT
 from Tkinter import NORMAL, Scrollbar, RIGHT, Y, Checkbutton, IntVar, FALSE
+from Tkinter import Listbox, SINGLE
 from ttk import Button, Style
 from select import select
 import ScrolledText
@@ -56,6 +57,7 @@ class MainWindow(Frame):
         self.IP = None
         self.PORT = None
         self.MASTER = "Nope"
+        self.COMMANDCHAR = "@"
         
         f = open("data.ini", 'r')
         for line in f:
@@ -67,7 +69,9 @@ class MainWindow(Frame):
             if parts[0] == "NAME":
                 self.player = parts[1].rstrip()
             if parts[0] == "MASTER":
-                self.MASTER = "password"
+                self.MASTER = parts[1].rstrip()
+            if parts[0] == "COMMANDCHAR":
+                self.COMMANDCHAR = parts[1].rstrip()
         f.close()
         if self.player == None:
             self.obtainPlayer()
@@ -143,8 +147,12 @@ class MainWindow(Frame):
         self.recvArea.config(state=DISABLED)
 
         # Area donde salen los nombres de los players
-        self.playersArea = Text(self, height= 27, width=12)
+        #self.playersArea = Text(self, height= 27, width=12)
+        #self.playersArea.place(x=550, y=5)
+
+        self.playersArea = Listbox(self, height= 27, width=12, selectmode=SINGLE)
         self.playersArea.place(x=550, y=5)
+        self.playersArea.bind("<Double-Button-1>", self.onDouble)
 
         # Texto para el Area para poner el bono con el que tiras
         self.bonuslabel = Label(self, text="Bonus")
@@ -168,6 +176,13 @@ class MainWindow(Frame):
         self.rollButton = Button(self, text="Tirar dado", command = self.roll)
         self.rollButton.place(x=655, y=55)
 
+    def onDouble(self, event):
+        selection = self.playersArea.curselection()
+        value = self.playersArea.get(selection[0])
+        self.sendArea.delete("1.0", END)
+        whisp = self.COMMANDCHAR + "w " + value + " "
+        self.sendArea.insert(INSERT, whisp)
+
     def roll(self):
         bonus = self.bonusArea.get("1.0", END)
         self.bonusArea.delete("1.0", END)
@@ -188,7 +203,7 @@ class MainWindow(Frame):
         txt = txt.rstrip()
         msg = Message()
         msg.player = self.player
-        if txt[0] == "@":
+        if txt[0] == self.COMMANDCHAR:
             if txt[1] == 'w' or txt[1] == 'W':
                 pieces = txt.split(" ", 2)
                 msg.target = pieces[1]
@@ -223,6 +238,9 @@ class MainWindow(Frame):
         txt = self.sendArea.get("1.0", END)
         self.sendArea.delete("1.0", END)
         msg = self.parseMessage(txt[0:64])
+        if msg.target != None:
+            lastwhisp = self.COMMANDCHAR + "w " + msg.target + " "
+            self.sendArea.insert(INSERT, lastwhisp)
         if (txt != "" and msg != None):
             self.s.send(msg.serialize())
 
@@ -233,14 +251,15 @@ class MainWindow(Frame):
         self.recvArea.yview(END)
 
     def addPlayer(self, player):
-        self.playersArea.config(state=NORMAL)
-        self.playersArea.insert(INSERT, player + "\n")
-        self.playersArea.config(state=DISABLED)
-
+        #self.playersArea.config(state=NORMAL)
+        #self.playersArea.insert(INSERT, player + "\n")
+        self.playersArea.insert(END, player)
+        #self.playersArea.config(state=DISABLED)
+        
     def setPlayers(self, msg):
-        self.playersArea.config(state=NORMAL)
-        self.playersArea.delete("1.0", END)
-        self.playersArea.config(state=DISABLED)
+        #self.playersArea.config(state=NORMAL)
+        self.playersArea.delete("0", END)
+        #self.playersArea.config(state=DISABLED)
         players = msg.getAll()
         for p in players:
             self.addPlayer(p)
