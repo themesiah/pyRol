@@ -48,4 +48,4 @@ f.write(version)
 f.close()
 s.close()
 
-os.startfile("rol/rolClient.exe")
+os.startfile("rol\\rolClient.exe")
