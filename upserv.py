@@ -7,7 +7,7 @@ class Updater(object):
 
     def initSocket(self):
         self.IP = ""
-        self.PORT = 6901
+        self.PORT = 6900
         self.BUFFER = 4098
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.bind((self.IP, self.PORT))
@@ -40,6 +40,7 @@ class Updater(object):
         
     
     def getFiles(self, version):
+        print "Version is: " + str(self.VERSION)
         i = int(self.VERSION)
         version = int(version)
         toUpdate = []
@@ -76,9 +77,3 @@ class Updater(object):
         print "Finished updating: " + str(addr)
         conn.send(self.VERSION)
         conn.close()
-    
-
-
-u = Updater()
-while 1:
-    pass

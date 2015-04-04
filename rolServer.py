@@ -2,8 +2,21 @@
 import socket
 import thread
 import random
+import time
 from Message import Message
+from upserv import Updater
 
+
+
+def getHelpMessage(player, cmd):
+    msg = Message()
+    msg.player = "Help"
+    msg.target = player
+    msg.addMessage(cmd + "help: Muestra la ayuda.")
+    msg.addMessage(cmd + "w <usuario> <mensaje>: Envía un mensaje privado.")
+    msg.addMessage(cmd + "roll <macro>: Utiliza una macro.")
+    msg.addMessage(cmd + "proll <macro>: Utiliza una macro invisible.")
+    return msg
 
 def checkNameOk(name, pl):
     incorrect = False
@@ -34,6 +47,10 @@ def roll(dice):
             diceActual = random.randrange(1, 100)
             rolled += diceActual
             abiertas += 1
+        if abiertas == 0 and rolled <= 3:
+            diceActual = random.randrange(1, 100)
+            rolled -= diceActual
+            pifia = diceActual
         rolled += int(dice[2])
 
     elif dice[1] == "fudge":
@@ -61,6 +78,7 @@ def connection(s, pl):
         msg = Message()
         msg = msg.unserialize(data)
         name = msg.player
+        cmd = msg.getAll()[0]
         if msg.master == "password":
             masterStatus = True
             print "Logged a Master with name: " + name
@@ -73,6 +91,10 @@ def connection(s, pl):
             conn.send(msg.serialize())
             conn.close()
             finished = True
+            for x in pl:
+                if x[0] == conn:
+                    temp = x
+            pl.remove(temp)
         else:
             print 'With name: ', name
             for p in pl:
@@ -85,6 +107,10 @@ def connection(s, pl):
                 msg.addMessage(n[1])
             for c in pl:
                 c[0].send(msg.serialize())
+            time.sleep(0.5)
+            msg = getHelpMessage(name, cmd)
+            msg.addMessage("Bienvenido a pyRol!")
+            conn.send(msg.serialize())
             finished = False
     while not finished:
         data = conn.recv(BUFFER)
@@ -114,7 +140,7 @@ def connection(s, pl):
         elif msg.type == 3:
             dice = msg.roll
             rolled = roll(dice)
-            finalText = msg.player + " ha sacado un "
+            finalText = msg.player + "(" + str(dice) + " ) ha sacado un "
             finalText += str(rolled)
             msg = Message()
             msg.player = "Server"
@@ -125,7 +151,7 @@ def connection(s, pl):
         elif msg.type == 4:
             dice = msg.roll
             rolled = roll(dice)
-            finalText = "(oculto) " + msg.player + " ha sacado un "
+            finalText = "(oculto) " + msg.player + "(" + str(dice) + " ) ha sacado un "
             finalText += str(rolled)
             msg = Message()
             msg.player = "Server"
@@ -138,15 +164,27 @@ def connection(s, pl):
             for p in pl:
                 if p[1] == msg.target or p[2] == True:
                     p[0].send(msg.serialize())
-            
+
+        elif msg.type == 7:
+            cmd = msg.getAll()[0]
+            player = msg.player
+            msg = getHelpMessage(player, cmd)
+            for p in pl:
+                if p[1] == msg.target:
+                    p[0].send(msg.serialize())
                 
 
+
+thread.start_new_thread( Updater, ())
+time.sleep(0.1)
+
 IP = ""
-PORT = 6900
+PORT = 6899
 BUFFER = 4098
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((IP, PORT))
+print "Servidor de rol escuchando en el puerto " + str(PORT)
 
 playersList = []
 connection(s, playersList, )

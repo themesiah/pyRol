@@ -26,6 +26,7 @@ class MainWindow(Frame):
         msg = Message()
         msg.player = self.player
         msg.master = self.MASTER
+        msg.addMessage(self.COMMANDCHAR)
         self.s.send(msg.serialize())
         parent.bind('<Return>', self.send)
         self.initUI()
@@ -95,19 +96,17 @@ class MainWindow(Frame):
 
     def socketManager(self):
         while(self.open):
-            time.sleep(0.3)
+            #time.sleep(0.3)
             if select([self.s], [self.s], [self.s])[0] and self.open:
                 data = self.s.recv(self.BUFFER)
                 recvMsg = Message()
                 recvMsg = recvMsg.unserialize(data)
-                if recvMsg.type == 0:
-                    self.showMessage(recvMsg.player, recvMsg.getAll()[0])
+                if recvMsg.type == 0 or recvMsg.type == 6:
+                    self.showMessage(recvMsg.player, recvMsg.getAll())
                 elif recvMsg.type == 1:
                     self.setPlayers(recvMsg)
                 elif recvMsg.type == 5:
                     self.onClose()
-                elif recvMsg.type == 6:
-                    self.showMessage(recvMsg.player, recvMsg.getAll()[0])
 
     def centerWindow(self):
       
@@ -146,9 +145,6 @@ class MainWindow(Frame):
         self.recvArea.config(state=DISABLED)
 
         # Area donde salen los nombres de los players
-        #self.playersArea = Text(self, height= 27, width=12)
-        #self.playersArea.place(x=550, y=5)
-
         self.playersArea = Listbox(self, height= 27, width=12, selectmode=SINGLE)
         self.playersArea.place(x=550, y=5)
         self.playersArea.bind("<Double-Button-1>", self.onDouble)
@@ -203,31 +199,32 @@ class MainWindow(Frame):
         msg = Message()
         msg.player = self.player
         if txt[0] == self.COMMANDCHAR:
-            if (txt[1] == 'w' or txt[1] == 'W') and len(txt) > 2:
+            if txt.split(" ")[0][1:] == "help":
+                msg.addMessage(self.COMMANDCHAR)
+                msg.type = 7
+            elif len(txt.split(" ")) > 1 and (txt.split(" ")[0][1:] == "w" or txt.split(" ")[0][1:] == "W"):
                 pieces = txt.split(" ", 2)
                 msg.target = pieces[1]
                 msg.addMessage("("+msg.target+") " + pieces[2])
                 msg.type = 6
-            else:
-                msg = None
-            if txt.split(" ")[0][1:] == "roll":
+            elif len(txt.split(" ")) > 1 and txt.split(" ")[0][1:] == "roll":
                 if txt.split(" ")[1] in self.macros:
                     roll = self.macros[txt.split(" ")[1]]
                     msg = Message()
-                    msg.player = self.player
                     msg.type = 3
                     msg.roll = roll
                 else:
                     msg = None
-            if txt.split(" ")[0][1:] == "proll":
+            elif len(txt.split(" ")) > 1 and txt.split(" ")[0][1:] == "proll":
                 if txt.split(" ")[1] in self.macros:
                     roll = self.macros[txt.split(" ")[1]]
                     msg = Message()
-                    msg.player = self.player
                     msg.type = 4
                     msg.roll = roll
                 else:
                     msg = None
+            else:
+                msg = None
         else:
             msg.addMessage(txt)
         return msg
@@ -239,28 +236,24 @@ class MainWindow(Frame):
         txt = self.sendArea.get("1.0", END)
         self.sendArea.delete("1.0", END)
         msg = self.parseMessage(txt[0:64])
-        if msg.target != None:
-            lastwhisp = self.COMMANDCHAR + "w " + msg.target + " "
-            self.sendArea.insert(INSERT, lastwhisp)
-        if (txt != "" and msg != None):
+        if msg != None and txt != "":
+            if msg.target != None:
+                lastwhisp = self.COMMANDCHAR + "w " + msg.target + " "
+                self.sendArea.insert(INSERT, lastwhisp)
             self.s.send(msg.serialize())
 
     def showMessage(self, player, msg):
         self.recvArea.config(state=NORMAL)
-        self.recvArea.insert(INSERT, player + ": " + msg + "\n")
+        for message in msg:
+            self.recvArea.insert(INSERT, player + ": " + message + "\n")
         self.recvArea.config(state=DISABLED)
         self.recvArea.yview(END)
 
     def addPlayer(self, player):
-        #self.playersArea.config(state=NORMAL)
-        #self.playersArea.insert(INSERT, player + "\n")
         self.playersArea.insert(END, player)
-        #self.playersArea.config(state=DISABLED)
         
     def setPlayers(self, msg):
-        #self.playersArea.config(state=NORMAL)
         self.playersArea.delete("0", END)
-        #self.playersArea.config(state=DISABLED)
         players = msg.getAll()
         for p in players:
             self.addPlayer(p)

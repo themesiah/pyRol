@@ -8,6 +8,7 @@ Type 3 = Roll
 Type 4 = Invisible roll
 Type 5 = Refused connection
 Type 6 = Whisp
+Type 7 = Comando HELP
 """
 class Message(object):
     def __init__ (self):
