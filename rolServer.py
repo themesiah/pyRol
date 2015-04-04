@@ -140,7 +140,7 @@ def connection(s, pl):
         elif msg.type == 3:
             dice = msg.roll
             rolled = roll(dice)
-            finalText = msg.player + "(" + str(dice) + " ) ha sacado un "
+            finalText = msg.player + "(" + str(dice[2]) + ") ha sacado un "
             finalText += str(rolled)
             msg = Message()
             msg.player = "Server"
@@ -151,7 +151,7 @@ def connection(s, pl):
         elif msg.type == 4:
             dice = msg.roll
             rolled = roll(dice)
-            finalText = "(oculto) " + msg.player + "(" + str(dice) + " ) ha sacado un "
+            finalText = "(oculto) " + msg.player + "(" + str(dice[2]) + ") ha sacado un "
             finalText += str(rolled)
             msg = Message()
             msg.player = "Server"
