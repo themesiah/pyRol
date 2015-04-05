@@ -1,7 +1,7 @@
 # -*- coding: cp1252 -*-
 from Tkinter import Tk, BOTH, Frame, Label, Text, E, W, S, N, DISABLED, END, INSERT
 from Tkinter import NORMAL, Scrollbar, RIGHT, Y, Checkbutton, IntVar, FALSE
-from Tkinter import Listbox, SINGLE
+from Tkinter import Listbox, SINGLE, Scale
 from ttk import Button, Style
 from select import select
 import ScrolledText
@@ -9,6 +9,7 @@ import socket, time
 import thread
 from Message import Message
 
+import os, wave, pyaudio, sys
 class MainWindow(Frame):
   
     def __init__(self, parent):
@@ -32,6 +33,30 @@ class MainWindow(Frame):
         self.initUI()
         self.centerWindow()
         thread.start_new_thread(self.socketManager, ())
+
+    def playSound (self):
+        CHUNK = 1024
+        wf = wave.open("Pomposity.mp3", 'rb')
+        p = pyaudio.PyAudio()
+
+        stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                        channels=wf.getnchannels(),
+                        rate=wf.getframerate(),
+                        output=True)
+
+        data = wf.readframes(CHUNK)
+
+        while data != '':
+            stream.write(data)
+            data = wf.readframes(CHUNK)
+
+        stream.stop_stream()
+        stream.close()
+
+        p.terminate()
+
+    def playMusic(self):
+        self.playSound("Pomposity.mp3")
 
 
     def onClose(self):
@@ -170,6 +195,20 @@ class MainWindow(Frame):
         # Botón para tirar dado
         self.rollButton = Button(self, text="Tirar dado", command = self.roll)
         self.rollButton.place(x=655, y=55)
+
+        # Scroll de volumen
+        self.volume = Scale(self, from_=0, to=100)
+        self.volume.place(x=655, y=85)
+        self.volume.set(100)
+
+        # Texto para el scroll de volumen
+        self.bonuslabel = Label(self, text="Volumen")
+        self.bonuslabel.place(x=715, y=130)
+
+        # Botón para reproducir música
+        self.playButton = Button(self, text="Play", command = self.playMusic)
+        self.playButton.place(x=655, y=200)
+        
 
     def onDouble(self, event):
         selection = self.playersArea.curselection()
