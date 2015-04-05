@@ -1,2 +1,4 @@
 $1
 readme.txt
+$2
+audio/message.mp3

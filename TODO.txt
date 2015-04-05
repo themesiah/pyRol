@@ -1,5 +1,4 @@
 Poner el chat to guapo.
 
-Añadir música
+No se puede cerrar chat si el server cierra antes.
 
-Poner comentarios
