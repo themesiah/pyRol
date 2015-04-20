@@ -2,3 +2,4 @@ Poner el chat to guapo.
 
 No se puede cerrar chat si el server cierra antes.
 
+Si un cliente peta, petan los servers rolServer y remoteSound

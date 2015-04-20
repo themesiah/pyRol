@@ -55,7 +55,7 @@ def roll(dice):
             diceActual = random.randrange(1, 100)
             rolled += diceActual
             abiertas += 1
-        if abiertas == 0 and rolled <= 3:
+        if abiertas == 1 and rolled <= 3:
             diceActual = random.randrange(1, 100)
             rolled -= diceActual
             pifia = diceActual
